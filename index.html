@@ -4,15 +4,62 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>영화 찾아보기</title>
+    <link rel="stylesheet" href="./CSS/reset.css">
     <link rel="stylesheet" href="./CSS/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
 <body>
     <div id="wrap">
         <div id="header_wrap">
-            <header></header>
+            <header>
+                <ul>
+                    <li>
+                        <div class="button_wrap">
+                            <button class="search">
+                                <i class="fa-solid fa-magnifying-glass"></i>
+                            </button>
+                            <div class="input_wrap">
+                                <input type="text">
+                            </div>
+                        </div>
+                        <div class="button_wrap">
+                            <button class="total">
+                                <i class="fa-solid fa-list"></i>
+                            </button>
+                        </div>
+                    </li>
+                    <!-- 검색 버튼, 전체 목록 -->
+                    <li>
+                        <div class="button_wrap">
+                            <button class="darkmode">
+                                <i class="fa-solid fa-circle-half-stroke"></i>
+                            </button>
+                        </div>
+                    </li>
+                    <!-- 다크 모드 -->
+                </ul>
+            </header>
         </div>
         <div id="contents_wrap">
-            <main></main>
+            <main>
+                <h1 class="main_bg">큰 배너</h1>
+                <div class="contents_wrap">
+                    <ul>
+                        <li class="movie_card">
+                            <div class="movie_card_inner">
+                                <div class="img_wrap">
+                                    <img src="./image/sample_movie_img.png" alt="test">
+                                </div>
+                                <h3 class="movie_name">영화 이름</h3>
+                                <p class="movie_detail">영화 설명</p>
+                                <p class="movie_rate">평가: 9,999개</p>
+                            </div>
+                        </li>
+                        <!-- 영화 카드가 들어온다. -->
+                        <!-- 이미지, 이름, 설명, 평가 -->
+                    </ul>
+                </div>
+            </main>
             <footer></footer>
         </div>
     </div>

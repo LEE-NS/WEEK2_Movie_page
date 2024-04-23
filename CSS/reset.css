@@ -5,3 +5,24 @@
     padding: 0;
     box-sizing: border-box;
 }
+button {
+    border: none;
+    background: none;
+    border-radius: 0;
+    cursor: pointer;
+    color: inherit;
+}
+input {
+    border: none;
+    background: none;
+}
+ul {
+    list-style: none;
+}
+li {
+    list-style: none;
+}
+a {
+    text-decoration: none;
+    color: inherit;
+}
