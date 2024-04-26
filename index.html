@@ -2,8 +2,12 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>영화 찾아보기</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+    <title>Sample Cinema</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@100..900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="./CSS/reset.css">
     <link rel="stylesheet" href="./CSS/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
@@ -15,15 +19,16 @@
                 <ul>
                     <li>
                         <div class="button_wrap">
-                            <button class="search">
+                            <button class="search" tabindex="-1">
                                 <i class="fa-solid fa-magnifying-glass"></i>
+                                <i class="fa-solid fa-xmark"></i>
                             </button>
                             <div class="input_wrap">
-                                <input type="text">
+                                <input type="text" placeholder="검색할 영화 제목을 입력하세요">
                             </div>
                         </div>
                         <div class="button_wrap">
-                            <button class="total">
+                            <button class="total" tabindex="-1">
                                 <i class="fa-solid fa-list"></i>
                             </button>
                         </div>
@@ -31,7 +36,7 @@
                     <!-- 검색 버튼, 전체 목록 -->
                     <li>
                         <div class="button_wrap">
-                            <button class="darkmode">
+                            <button class="darkmode" tabindex="-1">
                                 <i class="fa-solid fa-circle-half-stroke"></i>
                             </button>
                         </div>
@@ -42,26 +47,54 @@
         </div>
         <div id="contents_wrap">
             <main>
-                <h1 class="main_bg">큰 배너</h1>
-                <div class="contents_wrap">
-                    <ul>
-                        <li class="movie_card">
-                            <div class="movie_card_inner">
-                                <div class="img_wrap">
-                                    <img src="./image/sample_movie_img.png" alt="test">
-                                </div>
-                                <h3 class="movie_name">영화 이름</h3>
-                                <p class="movie_detail">영화 설명</p>
-                                <p class="movie_rate">평가: 9,999개</p>
-                            </div>
-                        </li>
-                        <!-- 영화 카드가 들어온다. -->
-                        <!-- 이미지, 이름, 설명, 평가 -->
-                    </ul>
+                <h1 class="main_bg" href="#">
+                    <a href="#">Sample Cinema</a>
+                </h1>
+                <!-- 타이틀 -->
+                <div class="movie_list_place">
+                    <h2 class="listname">현재 상영 중</h2>
+                    <div class="list_wrap">
+                        <ul>
+                            <!-- 영화 카드가 들어온다. -->
+                        </ul>
+                    </div>
                 </div>
+                <!-- 영화 리스트 -->
+                <div class="movie_list_place">
+                    <h2 class="listname">인기 순</h2>
+                    <div class="list_wrap">
+                        <ul>
+                            <!-- 영화 카드가 들어온다. -->
+                        </ul>
+                    </div>
+                </div>
+                <!-- 영화 리스트 -->
+                <div class="movie_list_place">
+                    <h2 class="listname">높은 평점 순</h2>
+                    <div class="list_wrap">
+                        <ul>
+                            <!-- 영화 카드가 들어온다. -->
+                        </ul>
+                    </div>
+                </div>
+                <!-- 영화 리스트 -->
+                <div class="movie_list_place">
+                    <h2 class="listname">개봉 예정</h2>
+                    <div class="list_wrap">
+                        <ul>
+                            <!-- 영화 카드가 들어온다. -->
+                        </ul>
+                    </div>
+                </div>
+                <!-- 영화 리스트 -->
             </main>
-            <footer></footer>
+            <footer>
+                <p class="copyright">
+                    © 2024 Sample Cinema, Inc. All Rights Reserved
+                </p>
+            </footer>
         </div>
     </div>
+    <script src="./script/main.js"></script>
 </body>
 </html>
