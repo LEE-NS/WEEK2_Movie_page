@@ -15,6 +15,8 @@ const listUp = ["now_playing", "popular", "top_rated", "upcoming"];
 const listName = document.querySelectorAll('.listname'); //리스트 타이틀
 let main = document.querySelector('main');
 let body = document.querySelector('body');
+let footer = document.querySelector('footer');
+let headerNav = document.querySelector('#header_wrap header ul');
 
 const options = {
     method: 'GET',
@@ -100,15 +102,37 @@ const darkmodeBtn = document.querySelector('.darkmode');
 const inputWrap = document.querySelector('.input_wrap');
 const searchInput = inputWrap.querySelector('input');
 
-let isClicked = false;
+let isClickedLight = false;
+let isClickedSearch = false;
 
 searchBtn.addEventListener('click', () => {
-    isClicked = !isClicked;
-    searchInputToggle(isClicked);
+    isClickedSearch = !isClickedSearch;
+    searchInputToggle(isClickedSearch);
 });
 
-function searchInputToggle(isClicked) {
-    if(isClicked) {
+darkmodeBtn.addEventListener('click', () => {
+    isClickedLight = !isClickedLight;
+    if(isClickedLight) {
+        headerNav.style.backgroundColor = "#d9d9d9";
+        body.style.backgroundColor = "#f1f1f1";
+        footer.style.color = "#53464b";
+        
+        listName.forEach((elem) => {
+            elem.style.color = "#53464b";
+        });
+    } else {
+        headerNav.style.backgroundColor = "#272727";
+        body.style.backgroundColor = "#0c0c0c";
+        footer.style.color = "#aa9ca1";
+        
+        listName.forEach((elem) => {
+            elem.style.color = "#b4a0a7";
+        });
+    }
+})
+
+function searchInputToggle(isClickedSearch) {
+    if(isClickedSearch) {
         console.log('눌림')
         inputWrap.style.opacity = '1';
         inputWrap.style.left = '100px';
@@ -130,8 +154,13 @@ function searchInputToggle(isClicked) {
 
 body.addEventListener('keydown', (e) => {
     if(e.key === "Escape") {
-        isClicked = !isClicked;
-        searchInputToggle(isClicked);
+        inputWrap.style.opacity = '0';
+        inputWrap.style.left = '-99999px';
+        cancelIcon.style.opacity = "0";
+        cancelIcon.style.textIndent = "-99999px";
+        magnifyIcon.style.opacity = "1";
+        magnifyIcon.style.textIndent = "0";
+        isClickedSearch = false;
     }
 });
 
@@ -148,19 +177,66 @@ searchInput.addEventListener('keydown',(e) => {
     // enter : 검색 동작
     if(e.key === "Enter") {
         console.log('검색한다')
+        console.log(searchInput.value);
+        let text = searchInput.value;
+
+        if(text === '') {
+            alert('검색어를 입력해주세요')
+            searchInput.focus();
+            return
+        } else if(text.length < 2) {
+            alert('검색어를 두 자리 이상 입력해주세요')
+            searchInput.focus();
+            return
+        }
+        
+        let searched = searchToTitle(text);
+        console.log(searched);
+
+        if(searched.length === 0) {
+            alert(`'${text}' 에 대한 검색 결과가 없습니다.`);
+        }
+        
         
 
-        // function searchToTitle() {
-        //     fetch(`https://api.themoviedb.org/3/movie/${listUp}?language=ko&page=1`, options)
-        //     .then(response => response.json())
-        //     .then(data => {
-        //         console.log(data);
-                
-        //         });
-                
-        //     }
-    }
-
-    // esc : 검색 아이콘을 한번 더 누르는 동작
-
+        
+    };
 });
+
+function searchToTitle(text) {
+    const modText = text.toUpperCase().split(' ').join('');
+    console.log(modText);
+
+    let results = []; // 검색결과 타이틀 담는 곳
+
+    listUp.forEach(elem => {
+        fetch(`https://api.themoviedb.org/3/movie/${elem}?language=ko&page=1`, options)
+        .then(response => response.json())
+        .then(data => {
+            //main 노드의 .movie_list_place 를 모두 삭제 후 다시 .movie_list_place 형식을 만들어 '검색결과' 로 반환
+
+            for(let i = 0; i < Object.keys(data['results']).length; i++) {
+                let titleData = data['results'][i]['title'];
+
+                if(results.includes(titleData)) {
+                    break
+                }; // 검색 결과가 변형 전 중복될 경우 검색 엔진 전에 다음 대상으로 넘어가기
+
+                let modTitleData = titleData.toUpperCase().split(' ').join(''); //공백 없는 영화 타이틀
+                let titleArrSize = modTitleData.length - modText.length + 1;
+                let splitedTitle = []; // ex)'쇼생크 탈출' 검색을 위해 '쇼생'을 입력했다면 ['쇼생', '생크', '크탈', '탈출'] 과 같이 들어와야한다.
+                for(let j = 0; j < titleArrSize; j++) {
+                    splitedTitle.push(modTitleData.substring(j, j + modText.length));
+                };
+
+                if(splitedTitle.includes(modText)) {
+                    results.push(titleData)
+                } else {
+                    continue
+                };
+            };    
+        });
+    });
+
+    return results
+};

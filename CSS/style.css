@@ -170,7 +170,7 @@ main ul .movie_card {
 }
 main ul .movie_card:hover {
     transform: scale(1.03);
-    box-shadow: 0px 0px 8px 4px #000000;
+    box-shadow: 0px 0px 10px 3px #3a3a3a88;
     
     transition: all 0.3s;
 }
@@ -236,7 +236,6 @@ main ul .movie_card:hover {
 /* footer */
 footer {
     text-align: center;
-    background-color: #0c0c0c;
     color: #aa9ca1;
 }
 footer .copyright {
