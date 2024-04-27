@@ -16,16 +16,17 @@ const listName = document.querySelectorAll('.listname'); //리스트 타이틀
 let main = document.querySelector('main');
 let movieListWrap = main.querySelector('.movie_list_wrap');
 
-
-let body = document.querySelector('body');
-let footer = document.querySelector('footer');
-let headerNav = document.querySelector('#header_wrap header ul');
+const body = document.querySelector('body');
+const footer = document.querySelector('footer');
+const headerNav = document.querySelector('#header_wrap header ul');
+const spinnerOuter = document.querySelector('.loading_spinner');
+const spinnerInner = document.querySelector('.spinner_inner');
 
 const options = {
     method: 'GET',
     headers: {
         accept: 'application/json',
-        Authorization: '',
+        Authorization: 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJjMTE4NTdhNTg1MThiOWVjZWRjMzE4ZDVkYjE1OWRkOSIsInN1YiI6IjY2MjhhZmRmNjNkOTM3MDE0YTcyMmMxNiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.ZrKj2Zyb565lbyPKH1RQSzBsq3AYrMAoFe7QZKm-P2Q',
     }
 };
 
@@ -43,10 +44,13 @@ listUp.forEach(elem => {
                     const overview = data['results'][contentCount]['overview'];
                     const voteAverage = data['results'][contentCount]['vote_average'];
                     const movieId = data['results'][contentCount]['id']
+                    const backdropPath = data['results'][contentCount]['backdrop_path'];
         
                     let movieCard = `
                     <li class="movie_card">
-                        <p class="movie_bg">영화 포스터</p>
+                        <p class="movie_bg">
+                            <img src="https://image.tmdb.org/t/p/w500${backdropPath}" alt="">
+                        </p>
                         <h3 class="movie_name">${title}</h3>
                         <h4 class="original_name">${originalTitle}</h4>
                         <p class="release_date">${releaseDate.slice(0, 4)}</p>
@@ -56,14 +60,6 @@ listUp.forEach(elem => {
                     </li>
                     `;
                     listingSection.innerHTML += movieCard;
-                };
-
-                for(let contentCount = 0; contentCount < Object.keys(data['results']).length; contentCount++) {
-                    const backdropPath = data['results'][contentCount]['backdrop_path'];
-                    
-                    const backdropOnBgs = listingSection.querySelectorAll('.movie_card .movie_bg');
-        
-                    backdropOnBgs.item(contentCount).setAttribute("style", `background-image: url(https://image.tmdb.org/t/p/w500${backdropPath});`); //background-image 속성으로 배경 지정
                 };
             });
         }; // 들어온 영화 데이터를 카드 형식으로 만들어서 해당 섹션에 배치시켜주는 함수
@@ -91,9 +87,6 @@ main.addEventListener('click', (e) => {
     }; // 클릭한 타켓의 부모노드의 클래스 이름이 "movie_card" 일때만 alert 출력 (다른 곳을 이벤트 발생 시 콘솔에 출력되는 오류 방지)
 });
 // 영화 카드의 ID 출력
-
-//main의 요소중 하나인 movie list place 노드를 모두 없앤다.
-
 
 
 /* dynamic button action */
@@ -179,6 +172,21 @@ body.addEventListener('keydown', (e) => {
 // 3. 찾은 이름의 영화 카드를 리스트업한다.
 // 4. 리스트업이 완료되면 화면에 띄운다.
 
+let isSpin = false;
+
+function spinner(isSpin) {
+    isSpin === !isSpin
+    if(isSpin) {
+        spinnerOuter.setAttribute('style', 'display: none;');
+        spinnerInner.setAttribute('style', 'display: none;');
+        spinnerInner.setAttribute('style', 'animation: none;');
+    } else {
+        spinnerOuter.setAttribute('style', 'display: block;');
+        spinnerInner.setAttribute('style', 'display: block;');
+        spinnerInner.setAttribute('style', 'animation: rotate 1s linear infinite;');
+    }
+    
+}
 
 searchInput.addEventListener('keydown', (e) => {
     // enter : 검색 동작
@@ -188,18 +196,23 @@ searchInput.addEventListener('keydown', (e) => {
             alert('검색어를 입력해주세요')
             searchInput.focus();
             return
-        } 
+        }
         let promise = new Promise((resolve, reject) => {
             resolve(searchToTitle(text));
         });
 
+        spinner(isSpin)
+
         promise
         .then((resultArr) => {
             setTimeout(() => {
-                searchResult(resultArr);
-                searchInputToggle(false); //검색 버튼 동작 off
-            }, 3000);
-        })
+                searchResult(resultArr, text);
+                spinner(!isSpin)
+                isClickedSearch = !isClickedSearch;
+                searchInputToggle(isClickedSearch);
+                 //검색 버튼 동작 off
+            }, 1000);
+        });
 
         
     };        
@@ -220,7 +233,6 @@ function searchToTitle(text) {
         fetch(`https://api.themoviedb.org/3/movie/${elem}?language=ko&page=1`, options)
         .then(response => response.json())
         .then(data => {
-            console.log(data)
             for(let i = 0; i < Object.keys(data['results']).length; i++) {
                 //저장할 객체의 타이틀 프로퍼티에 접근해서 찾기
                 let titleData = data['results'][i]['title'];
@@ -244,42 +256,37 @@ function searchToTitle(text) {
     return allTitles
 };
 
-function searchResult(allTitles) {
+function searchResult(allTitles, text) {
+    
+    let uniqTitles = allTitles.filter((elem, index) => {
+        return allTitles.indexOf(elem) === index
+    });
+    
     let resultArea = `
     <div class="movie_list_place">
-        <h2 class="listname">검색 결과 </h2>
+        <h2 class="listname">'${text}' 에 대한 검색 결과<span class="result_num">${uniqTitles.length}개</span></h2>
         <div class="list_wrap">
-            <ul>
-                
-            </ul>
+            <ul></ul>
         </div>
     </div>
     `;
 
     movieListWrap.innerHTML = '';
     movieListWrap.innerHTML += resultArea;
-    //검색 결과 표시 공간 확보
-
-    console.log(movieListWrap.childNodes[1].childNodes[3].childNodes[1]);
-    console.log(typeof allTitles);
-    console.log(allTitles);
-    console.log(allTitles.length);
-
+    //검색 결과 표시 공간 확보    
     
     listUp.forEach(elem => {
         fetch(`https://api.themoviedb.org/3/movie/${elem}?language=ko&page=1`, options)
         .then(response => response.json())
         .then(data => {
+            console.log(data)
             for(let contentCount = 0; contentCount < Object.keys(data['results']).length; contentCount++) {
+                
                 let searchResultArea = movieListWrap.childNodes[1].childNodes[3].childNodes[1];
 
                 const title = data['results'][contentCount]['title'];
-
-            
-                console.log(allTitles);
-                console.log(title);
                 
-                if(allTitles.includes(title) && allTitles !== 0) {
+                if(uniqTitles.includes(title) && uniqTitles.length !== 0) {
                     const originalTitle = data['results'][contentCount]['original_title'];
                     const releaseDate = data['results'][contentCount]['release_date'];
                     const overview = data['results'][contentCount]['overview'];
@@ -290,7 +297,9 @@ function searchResult(allTitles) {
 
                     let movieCard = `
                     <li class="movie_card">
-                        <p class="movie_bg">영화 포스터</p>
+                        <p class="movie_bg">
+                            <img src="https://image.tmdb.org/t/p/w500${backdropPath}" alt="">
+                        </p>
                         <h3 class="movie_name">${title}</h3>
                         <h4 class="original_name">${originalTitle}</h4>
                         <p class="release_date">${releaseDate.slice(0, 4)}</p>
@@ -301,22 +310,15 @@ function searchResult(allTitles) {
                     `;
 
                     searchResultArea.innerHTML += movieCard;
-
-                    console.log(searchResultArea);
-
-                    // const backdropOnBgs = searchResultArea.querySelectorAll('.movie_card .movie_bg');
                     
-            
-                    // backdropOnBgs.item(contentCount).setAttribute("style", `background-image: url(https://image.tmdb.org/t/p/w500${backdropPath});`); //background-image 속성으로 배경 지정
-                        
+                    //해당 요소를 하나 등록하면 중복되는 요소 제거
+                    uniqTitles.splice(uniqTitles.indexOf(title), 1);
+                    continue
+                    // 등록이 끝난 요소는 배열에서 제거
+                } else if ( uniqTitles.length === 0) {
+                    break
                 }
-                
-                allTitles.filter((elem, index) => {
-                    elem.indexOf(elem) === index
-                }); //해당 요소를 하나 등록하면 중복되는 요소 제거
-                allTitles.splice(allTitles.indexOf(title), 1);
-                // 등록이 끝난 요소는 배열에서 제거
-            }
+            };
         });
     });
     return "success"
