@@ -1,19 +1,22 @@
 //1. 영화 API 이용하여 데이터 들여오기 V
 //1-1. 영화 정보 카드리스트 UI (제목, 내용, 이미지, 평점) V
-//1-2. 카드 클릭 시 id를 alert로 띄우기
+//1-2. 카드 클릭 시 id를 alert로 띄우기 V
 //2. 버튼 동작
 //2-1. 검색 동작
 
 //------------- 상기 목록은 필수 요건------------------
 
-//2-2. 전체 목록 동작 (일정 카테고리로 나누어서 표현되도록) (부가)
-//2-3. 다크모드 (부가)
+//2-2. 전체 목록 동작 (일정 카테고리로 나누어서 표현되도록) (부가) 
+//2-3. 다크모드 (부가) V
 
 
 /* 카드 리스트 만들기 */
 const listUp = ["now_playing", "popular", "top_rated", "upcoming"];
 const listName = document.querySelectorAll('.listname'); //리스트 타이틀
 let main = document.querySelector('main');
+let movieListWrap = main.querySelector('.movie_list_wrap');
+
+
 let body = document.querySelector('body');
 let footer = document.querySelector('footer');
 let headerNav = document.querySelector('#header_wrap header ul');
@@ -89,6 +92,7 @@ main.addEventListener('click', (e) => {
 });
 // 영화 카드의 ID 출력
 
+//main의 요소중 하나인 movie list place 노드를 모두 없앤다.
 
 
 
@@ -104,6 +108,10 @@ const searchInput = inputWrap.querySelector('input');
 
 let isClickedLight = false;
 let isClickedSearch = false;
+
+totalBtn.addEventListener('click', () => {
+    window.location.reload();
+})
 
 searchBtn.addEventListener('click', () => {
     isClickedSearch = !isClickedSearch;
@@ -172,71 +180,157 @@ body.addEventListener('keydown', (e) => {
 // 4. 리스트업이 완료되면 화면에 띄운다.
 
 
-searchInput.addEventListener('keydown',(e) => {
-
+searchInput.addEventListener('keydown', (e) => {
     // enter : 검색 동작
     if(e.key === "Enter") {
-        console.log('검색한다')
-        console.log(searchInput.value);
         let text = searchInput.value;
-
         if(text === '') {
             alert('검색어를 입력해주세요')
             searchInput.focus();
             return
-        } else if(text.length < 2) {
-            alert('검색어를 두 자리 이상 입력해주세요')
-            searchInput.focus();
-            return
-        }
-        
-        let searched = searchToTitle(text);
-        console.log(searched);
+        } 
+        let promise = new Promise((resolve, reject) => {
+            resolve(searchToTitle(text));
+        });
 
-        if(searched.length === 0) {
-            alert(`'${text}' 에 대한 검색 결과가 없습니다.`);
-        }
-        
-        
+        promise
+        .then((resultArr) => {
+            setTimeout(() => {
+                searchResult(resultArr);
+                searchInputToggle(false); //검색 버튼 동작 off
+            }, 3000);
+        })
 
         
-    };
+    };        
+        // if(resultArr.length === 0) {
+        //     alert(`'${text}' 에 대한 검색 결과가 없습니다.`);
+        // }    
+    
 });
 
-function searchToTitle(text) {
-    const modText = text.toUpperCase().split(' ').join('');
-    console.log(modText);
 
-    let results = []; // 검색결과 타이틀 담는 곳
+ /* searchTotitle이 끝나고 나서 실행 */
+function searchToTitle(text) {
+    
+    const modText = text.toUpperCase().split(' ').join('');
+    let allTitles = [];
 
     listUp.forEach(elem => {
         fetch(`https://api.themoviedb.org/3/movie/${elem}?language=ko&page=1`, options)
         .then(response => response.json())
         .then(data => {
-            //main 노드의 .movie_list_place 를 모두 삭제 후 다시 .movie_list_place 형식을 만들어 '검색결과' 로 반환
-
+            console.log(data)
             for(let i = 0; i < Object.keys(data['results']).length; i++) {
+                //저장할 객체의 타이틀 프로퍼티에 접근해서 찾기
                 let titleData = data['results'][i]['title'];
-
-                if(results.includes(titleData)) {
-                    break
-                }; // 검색 결과가 변형 전 중복될 경우 검색 엔진 전에 다음 대상으로 넘어가기
-
                 let modTitleData = titleData.toUpperCase().split(' ').join(''); //공백 없는 영화 타이틀
                 let titleArrSize = modTitleData.length - modText.length + 1;
                 let splitedTitle = []; // ex)'쇼생크 탈출' 검색을 위해 '쇼생'을 입력했다면 ['쇼생', '생크', '크탈', '탈출'] 과 같이 들어와야한다.
+
                 for(let j = 0; j < titleArrSize; j++) {
                     splitedTitle.push(modTitleData.substring(j, j + modText.length));
                 };
 
                 if(splitedTitle.includes(modText)) {
-                    results.push(titleData)
-                } else {
-                    continue
-                };
+                    allTitles.push(titleData); 
+                    //title
+                }; //입력된 텍스트가 같은 음절 수로 나눠진 대상의 배열에 있다면 results 배열에 넣는다.
             };    
         });
     });
-
-    return results
+    
+    // allTitles 반환(중복 있음)
+    return allTitles
 };
+
+function searchResult(allTitles) {
+    let resultArea = `
+    <div class="movie_list_place">
+        <h2 class="listname">검색 결과 </h2>
+        <div class="list_wrap">
+            <ul>
+                
+            </ul>
+        </div>
+    </div>
+    `;
+
+    movieListWrap.innerHTML = '';
+    movieListWrap.innerHTML += resultArea;
+    //검색 결과 표시 공간 확보
+
+    console.log(movieListWrap.childNodes[1].childNodes[3].childNodes[1]);
+    console.log(typeof allTitles);
+    console.log(allTitles);
+    console.log(allTitles.length);
+
+    
+    listUp.forEach(elem => {
+        fetch(`https://api.themoviedb.org/3/movie/${elem}?language=ko&page=1`, options)
+        .then(response => response.json())
+        .then(data => {
+            for(let contentCount = 0; contentCount < Object.keys(data['results']).length; contentCount++) {
+                let searchResultArea = movieListWrap.childNodes[1].childNodes[3].childNodes[1];
+
+                const title = data['results'][contentCount]['title'];
+
+            
+                console.log(allTitles);
+                console.log(title);
+                
+                if(allTitles.includes(title) && allTitles !== 0) {
+                    const originalTitle = data['results'][contentCount]['original_title'];
+                    const releaseDate = data['results'][contentCount]['release_date'];
+                    const overview = data['results'][contentCount]['overview'];
+                    const voteAverage = data['results'][contentCount]['vote_average'];
+                    const movieId = data['results'][contentCount]['id'];
+                    const backdropPath = data['results'][contentCount]['backdrop_path'];
+
+
+                    let movieCard = `
+                    <li class="movie_card">
+                        <p class="movie_bg">영화 포스터</p>
+                        <h3 class="movie_name">${title}</h3>
+                        <h4 class="original_name">${originalTitle}</h4>
+                        <p class="release_date">${releaseDate.slice(0, 4)}</p>
+                        <p class="movie_detail">${overview || "등록된 줄거리가 없습니다."}</p>
+                        <p class="movie_rate">⭐&nbsp;${voteAverage.toFixed(1)}</p>
+                        <p class="movie_id">${movieId}</p>
+                    </li>
+                    `;
+
+                    searchResultArea.innerHTML += movieCard;
+
+                    console.log(searchResultArea);
+
+                    // const backdropOnBgs = searchResultArea.querySelectorAll('.movie_card .movie_bg');
+                    
+            
+                    // backdropOnBgs.item(contentCount).setAttribute("style", `background-image: url(https://image.tmdb.org/t/p/w500${backdropPath});`); //background-image 속성으로 배경 지정
+                        
+                }
+                
+                allTitles.filter((elem, index) => {
+                    elem.indexOf(elem) === index
+                }); //해당 요소를 하나 등록하면 중복되는 요소 제거
+                allTitles.splice(allTitles.indexOf(title), 1);
+                // 등록이 끝난 요소는 배열에서 제거
+            }
+        });
+    });
+    return "success"
+};
+
+    
+
+
+
+
+
+
+
+
+
+
+
