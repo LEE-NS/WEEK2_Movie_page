@@ -10,16 +10,19 @@
 
 
 /* 카드 리스트 만들기 */
-const listUp = ["now_playing", "popular", "top_rated", "upcoming"];
-const listName = document.querySelectorAll('.listname'); //리스트 타이틀
-let main = document.querySelector('main');
-let movieListWrap = main.querySelector('.movie_list_wrap');
 
+const main = document.querySelector('main');
 const body = document.querySelector('body');
 const footer = document.querySelector('footer');
 const headerNav = document.querySelector('#header_wrap header ul');
+const modal = document.querySelector('.modal_wrap');
+
 const spinnerOuter = document.querySelector('.loading_spinner');
 const spinnerInner = document.querySelector('.spinner_inner');
+
+let movieListWrap = main.querySelector('.movie_list_wrap');
+const listUp = ["now_playing", "popular", "top_rated", "upcoming"];
+const listName = document.querySelectorAll('.listname'); //리스트 타이틀
 
 const options = {
     method: 'GET',
@@ -81,8 +84,23 @@ listUp.forEach(elem => {
 
 main.addEventListener('click', (e) => {
     if(e.target.parentNode.className === "movie_card") {
+        const movieName = e.target.parentNode.childNodes.item(3).innerText;
         const movieId = e.target.parentNode.childNodes.item(13).innerText;
-        alert(`영화 ID는 ${movieId} 입니다.`); 
+
+        let modalMovieName = modal.querySelector('.m_name');
+        let modalMovieId = modal.querySelector('.m_id');
+        let modalConfirm = modal.querySelector('.confirm');
+
+        modal.style.display = "block"
+        modalMovieName.innerHTML += `'${movieName}'`;
+        modalMovieId.innerHTML += movieId;
+
+        modalConfirm.addEventListener('click', () => {
+            modalMovieName.innerHTML = '';
+            modalMovieId.innerHTML = '';
+            modal.style.display = "none";
+        });
+
     }; // 클릭한 타켓의 부모노드의 클래스 이름이 "movie_card" 일때만 alert 출력 (다른 곳을 이벤트 발생 시 콘솔에 출력되는 오류 방지)
 });
 // 영화 카드의 ID 출력
