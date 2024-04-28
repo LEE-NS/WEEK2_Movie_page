@@ -3,6 +3,12 @@
 //1-2. 카드 클릭 시 id를 alert로 띄우기 V
 //2. 버튼 동작
 //2-1. 검색 동작 V
+//search action
+// 받아온 db에 대해 검색은 어떻게 이루어질까
+// 1. input을 통해 사용자가 입력한 텍스트를 받는다.
+// 2. 받은 텍스트로 이름을 찾는다. (공백은 무시한다. 한글 1자 이상의 텍스트를 받는다. 자/모음 단독 검색은 불가)
+// 3. 찾은 이름의 영화 카드를 리스트업한다.
+// 4. 리스트업이 완료되면 화면에 띄운다.
 
 //------------- 상기 목록은 필수 요건------------------
 
@@ -151,7 +157,6 @@ darkmodeBtn.addEventListener('click', () => {
 
 function searchInputToggle(isClickedSearch) {
     if(isClickedSearch) {
-        console.log('눌림')
         inputWrap.style.opacity = '1';
         inputWrap.style.left = '100px';
         cancelIcon.style.opacity = "1";
@@ -159,7 +164,6 @@ function searchInputToggle(isClickedSearch) {
         magnifyIcon.style.opacity = "0";
         magnifyIcon.style.textIndent = "-99999px";
     } else {
-        console.log('눌림2')
         inputWrap.style.opacity = '0';
         inputWrap.style.left = '-99999px';
         cancelIcon.style.opacity = "0";
@@ -182,13 +186,6 @@ body.addEventListener('keydown', (e) => {
     }
 });
 
-//search action
-// 받아온 db에 대해 검색은 어떻게 이루어질까
-// 1. input을 통해 사용자가 입력한 텍스트를 받는다.
-// 2. 받은 텍스트로 이름을 찾는다. (공백은 무시한다. 한글 1자 이상의 텍스트를 받는다. 자/모음 단독 검색은 불가)
-// 3. 찾은 이름의 영화 카드를 리스트업한다.
-// 4. 리스트업이 완료되면 화면에 띄운다.
-
 let isSpin = false;
 
 function spinner(isSpin) {
@@ -199,9 +196,8 @@ function spinner(isSpin) {
     } else {
         spinnerOuter.setAttribute('style', 'display: block;');
         spinnerInner.setAttribute('style', 'display: block;');
-    }
-    
-}
+    };
+}; // 로딩 스피너 토글
 
 searchInput.addEventListener('keydown', (e) => {
     // enter : 검색 동작
@@ -216,25 +212,19 @@ searchInput.addEventListener('keydown', (e) => {
             resolve(searchToTitle(text));
         });
 
-        spinner(isSpin)
+        spinner(isSpin); // 검색 중인 1초동안 로딩 스피너가 돌아간다.
 
         promise
         .then((resultArr) => {
             setTimeout(() => {
-                searchResult(resultArr, text);
-                spinner(!isSpin)
+                searchResult(resultArr, text); // 검색 결과 표시
+                spinner(!isSpin) // 로딩 스피너 제거
                 isClickedSearch = !isClickedSearch;
-                searchInputToggle(isClickedSearch);
+                searchInputToggle(isClickedSearch); // input 영역 제거
                  //검색 버튼 동작 off
             }, 1000);
         });
-
-        
     };        
-        // if(resultArr.length === 0) {
-        //     alert(`'${text}' 에 대한 검색 결과가 없습니다.`);
-        // }    
-    
 });
 
 
@@ -261,21 +251,18 @@ function searchToTitle(text) {
 
                 if(splitedTitle.includes(modText)) {
                     allTitles.push(titleData); 
-                    //title
                 }; //입력된 텍스트가 같은 음절 수로 나눠진 대상의 배열에 있다면 results 배열에 넣는다.
             };    
         });
     });
-    
-    // allTitles 반환(중복 있음)
-    return allTitles
+    return allTitles // 중복이 포함된 배열 allTitles 반환
 };
 
 function searchResult(allTitles, text) {
     
     let uniqTitles = allTitles.filter((elem, index) => {
         return allTitles.indexOf(elem) === index
-    });
+    }); //중복 요소 제거
     
     let resultArea = `
     <div class="movie_list_place">
@@ -294,11 +281,9 @@ function searchResult(allTitles, text) {
         fetch(`https://api.themoviedb.org/3/movie/${elem}?language=ko&page=1`, options)
         .then(response => response.json())
         .then(data => {
-            console.log(data)
             for(let contentCount = 0; contentCount < Object.keys(data['results']).length; contentCount++) {
                 
                 let searchResultArea = movieListWrap.childNodes[1].childNodes[3].childNodes[1];
-
                 const title = data['results'][contentCount]['title'];
                 
                 if(uniqTitles.includes(title) && uniqTitles.length !== 0) {
@@ -308,7 +293,6 @@ function searchResult(allTitles, text) {
                     const voteAverage = data['results'][contentCount]['vote_average'];
                     const movieId = data['results'][contentCount]['id'];
                     const backdropPath = data['results'][contentCount]['backdrop_path'];
-
 
                     let movieCard = `
                     <li class="movie_card">
@@ -324,12 +308,10 @@ function searchResult(allTitles, text) {
                     </li>
                     `;
 
-                    searchResultArea.innerHTML += movieCard;
-                    
-                    //해당 요소를 하나 등록하면 중복되는 요소 제거
-                    uniqTitles.splice(uniqTitles.indexOf(title), 1);
+                    searchResultArea.innerHTML += movieCard; // 검색 결과에 해당하는 영화 카드가 들어온다.
+
+                    uniqTitles.splice(uniqTitles.indexOf(title), 1); // 등록이 끝난 요소는 배열에서 제거
                     continue
-                    // 등록이 끝난 요소는 배열에서 제거
                 } else if ( uniqTitles.length === 0) {
                     break
                 }
