@@ -2,12 +2,11 @@
 //1-1. 영화 정보 카드리스트 UI (제목, 내용, 이미지, 평점) V
 //1-2. 카드 클릭 시 id를 alert로 띄우기 V
 //2. 버튼 동작
-//2-1. 검색 동작
+//2-1. 검색 동작 V
 
 //------------- 상기 목록은 필수 요건------------------
 
-//2-2. 전체 목록 동작 (일정 카테고리로 나누어서 표현되도록) (부가) 
-//2-3. 다크모드 (부가) V
+//2-2. 다크모드 (부가) V
 
 
 /* 카드 리스트 만들기 */
@@ -26,7 +25,7 @@ const options = {
     method: 'GET',
     headers: {
         accept: 'application/json',
-        Authorization: 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJjMTE4NTdhNTg1MThiOWVjZWRjMzE4ZDVkYjE1OWRkOSIsInN1YiI6IjY2MjhhZmRmNjNkOTM3MDE0YTcyMmMxNiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.ZrKj2Zyb565lbyPKH1RQSzBsq3AYrMAoFe7QZKm-P2Q',
+        Authorization: '',
     }
 };
 
@@ -179,11 +178,9 @@ function spinner(isSpin) {
     if(isSpin) {
         spinnerOuter.setAttribute('style', 'display: none;');
         spinnerInner.setAttribute('style', 'display: none;');
-        spinnerInner.setAttribute('style', 'animation: none;');
     } else {
         spinnerOuter.setAttribute('style', 'display: block;');
         spinnerInner.setAttribute('style', 'display: block;');
-        spinnerInner.setAttribute('style', 'animation: rotate 1s linear infinite;');
     }
     
 }

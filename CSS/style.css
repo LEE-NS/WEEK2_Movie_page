@@ -263,12 +263,8 @@ main ul .movie_card:hover {
     display: none;
     border: none;
     border-top: 3px solid #967f87;
-
-}
-.spinner_move {
     animation: rotate 1s linear infinite;
 }
-
 
 /* footer */
 footer {
