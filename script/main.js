@@ -30,13 +30,11 @@ let movieListWrap = main.querySelector('.movie_list_wrap');
 const listUp = ["now_playing", "popular", "top_rated", "upcoming"];
 const listName = document.querySelectorAll('.listname'); //리스트 타이틀
 
-const key = process.env.API_KEY;
-
 const options = {
     method: 'GET',
     headers: {
         accept: 'application/json',
-        Authorization: API_KEY,
+        Authorization: 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJjMTE4NTdhNTg1MThiOWVjZWRjMzE4ZDVkYjE1OWRkOSIsInN1YiI6IjY2MjhhZmRmNjNkOTM3MDE0YTcyMmMxNiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.ZrKj2Zyb565lbyPKH1RQSzBsq3AYrMAoFe7QZKm-P2Q',
     }
 };
 
