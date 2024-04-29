@@ -56,9 +56,7 @@ listUp.forEach(elem => {
         
                     let movieCard = `
                     <li class="movie_card">
-                        <p class="movie_bg">
-                            <img src="https://image.tmdb.org/t/p/w500${backdropPath}" alt="">
-                        </p>
+                        <img src="https://image.tmdb.org/t/p/w500${backdropPath}" alt="">
                         <h3 class="movie_name">${title}</h3>
                         <h4 class="original_name">${originalTitle}</h4>
                         <p class="release_date">${releaseDate.slice(0, 4)}</p>
@@ -89,7 +87,9 @@ listUp.forEach(elem => {
 }); // 4개의 카테고리의 각 1페이지의 컨텐츠들을 해당 영역에 배치
 
 main.addEventListener('click', (e) => {
-    if(e.target.parentNode.className === "movie_card" || e.target.parentNode.className === "movie_bg") {
+    if(e.target.parentNode.className === "movie_card") {
+        console.log(e.target.parentNode)
+
         const movieName = e.target.parentNode.childNodes.item(3).innerText;
         const movieId = e.target.parentNode.childNodes.item(13).innerText;
 

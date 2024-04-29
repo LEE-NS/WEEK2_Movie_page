@@ -242,14 +242,11 @@ main ul .movie_card:hover {
     
     transition: all 0.3s;
 }
-.movie_card .movie_bg {
+
+.movie_card img {
+    display: block;
     width: 300px;
     height: 170px;
-    transition: all 0.3s;
-    
-}
-.movie_bg img {
-    width: 100%;
     border-radius: 25px 25px 0 0
     
 }
