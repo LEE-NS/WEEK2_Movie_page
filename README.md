@@ -1,4 +1,5 @@
 ## Movie List Page 제작
+ - 🔗 https://week-2-movie-page.vercel.app/
  - 영화에 대한 정보를 열람할 수 있는 페이지를 만들어 본다.
 
 ### 목표
