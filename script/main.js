@@ -35,7 +35,69 @@ const options = {
         Authorization:
             "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJjMTE4NTdhNTg1MThiOWVjZWRjMzE4ZDVkYjE1OWRkOSIsInN1YiI6IjY2MjhhZmRmNjNkOTM3MDE0YTcyMmMxNiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.ZrKj2Zyb565lbyPKH1RQSzBsq3AYrMAoFe7QZKm-P2Q",
     },
-};
+}; // 영화 API 사용자 정보
+
+function searchToTitle(text) {
+    const modText = text.toUpperCase().split(" ").join("");
+    let allTitles = [];
+
+    sections.forEach((section) => {
+        fetch(`https://api.themoviedb.org/3/movie/${section}?language=ko&page=1`, options)
+        .then((response) => response.json())
+        .then((data) => {
+            data['results'].forEach(movie => {
+                let titleData = movie['title'];
+                let modTitleData = titleData.toUpperCase().split(" ").join(""); //공백 없는 영화 타이틀
+                let titleArrSize = modTitleData.length - modText.length + 1;
+                let splitTitle = [];
+                for (let j = 0; j < titleArrSize; j++) {
+                    splitTitle.push(modTitleData.substring(j, j + modText.length));
+                };
+                if (splitTitle.includes(modText)) {
+                    allTitles.push(titleData);
+                } //입력된 텍스트가 같은 음절 수로 나눠진 대상의 배열에 있다면 results 배열에 넣는다.
+            });
+        });
+    });
+    return allTitles; 
+}; //검색 후 중복되어있는 타이틀 배열을 반환하는 함수
+
+
+function searchResult(allTitles, text) {
+    let uniqTitles = allTitles.filter((elem, index) => {
+        return allTitles.indexOf(elem) === index;
+    }); //중복 요소 제거
+
+    let resultArea = `
+    <div class="movie-list-place">
+        <h2 class="list-name">'${text}' 에 대한 검색 결과<span class="result-num">${uniqTitles.length}개</span></h2>
+        <div class="list-wrap">
+            <ul></ul>
+        </div>
+    </div>
+    `;
+    movieListWrap.innerHTML = "";
+    movieListWrap.innerHTML += resultArea;
+    //검색 결과 표시 공간 확보
+
+    sections.forEach((section) => {
+        fetch(`https://api.themoviedb.org/3/movie/${section}?language=ko&page=1`, options)
+        .then((response) => response.json())
+        .then((data) => {
+            data['results'].forEach(movie => {
+                let searchResultArea = movieListWrap.childNodes[1].childNodes[3].childNodes[1];
+                let title = movie['title']
+
+                if (uniqTitles.includes(title) && uniqTitles.length !== 0) {
+                    createCard(movie, searchResultArea);
+                    uniqTitles.splice(uniqTitles.indexOf(title), 1); // 등록이 끝난 요소는 배열에서 제거
+                } else if (uniqTitles.length === 0) {
+                    return //검색된 결과를 나타낼 것이 없으면 종료
+                }
+            });
+        });
+    });
+}; //searchToTitle(text)로부터 받은 인자로 중복을 없애고 영화 정보를 가져와서 카드로 게시하는 함수
 
 function createCard(movie, target) {
     let movieCard = `
@@ -149,31 +211,21 @@ darkmodeBtn.addEventListener("click", () => {
 
 function searchInputToggle(isClickedSearch) {
     if (isClickedSearch) {
-        inputWrap.style.opacity = "1";
-        inputWrap.style.left = "100px";
-        cancelIcon.style.opacity = "1";
-        cancelIcon.style.textIndent = "0";
-        magnifyIcon.style.opacity = "0";
-        magnifyIcon.style.textIndent = "-99999px";
+        inputWrap.classList.add('input-wrap-toggle')
+        cancelIcon.classList.add('cancel-icon-toggle')
+        magnifyIcon.classList.add('magnify-icon-toggle')
     } else {
-        inputWrap.style.opacity = "0";
-        inputWrap.style.left = "-99999px";
-        cancelIcon.style.opacity = "0";
-        cancelIcon.style.textIndent = "-99999px";
-        magnifyIcon.style.opacity = "1";
-        magnifyIcon.style.textIndent = "0";
-        //검색창이 나온 상태에서 esc를 누르면 취소된다.
+        inputWrap.classList.remove('input-wrap-toggle')
+        cancelIcon.classList.remove('cancel-icon-toggle')
+        magnifyIcon.classList.remove('magnify-icon-toggle')
     }
 }
 
 body.addEventListener("keydown", (e) => {
     if (e.key === "Escape") {
-        inputWrap.style.opacity = "0";
-        inputWrap.style.left = "-99999px";
-        cancelIcon.style.opacity = "0";
-        cancelIcon.style.textIndent = "-99999px";
-        magnifyIcon.style.opacity = "1";
-        magnifyIcon.style.textIndent = "0";
+        inputWrap.classList.remove('input-wrap-toggle')
+        cancelIcon.classList.remove('cancel-icon-toggle')
+        magnifyIcon.classList.remove('magnify-icon-toggle')
         isClickedSearch = false;
     }
 });
@@ -214,64 +266,4 @@ searchInput.addEventListener("keydown", async (e) => {
 });
 
 /* searchTotitle이 끝나고 나서 실행 */
-function searchToTitle(text) {
-    const modText = text.toUpperCase().split(" ").join("");
-    let allTitles = [];
 
-    sections.forEach((section) => {
-        fetch(`https://api.themoviedb.org/3/movie/${section}?language=ko&page=1`, options)
-        .then((response) => response.json())
-        .then((data) => {
-            data['results'].forEach(movie => {
-                let titleData = movie['title'];
-                let modTitleData = titleData.toUpperCase().split(" ").join(""); //공백 없는 영화 타이틀
-                let titleArrSize = modTitleData.length - modText.length + 1;
-                let splitTitle = [];
-                for (let j = 0; j < titleArrSize; j++) {
-                    splitTitle.push(modTitleData.substring(j, j + modText.length));
-                };
-                if (splitTitle.includes(modText)) {
-                    allTitles.push(titleData);
-                } //입력된 텍스트가 같은 음절 수로 나눠진 대상의 배열에 있다면 results 배열에 넣는다.
-            });
-        });
-    });
-    return allTitles; 
-};
-
-
-function searchResult(allTitles, text) {
-    let uniqTitles = allTitles.filter((elem, index) => {
-        return allTitles.indexOf(elem) === index;
-    }); //중복 요소 제거
-
-    let resultArea = `
-    <div class="movie-list-place">
-        <h2 class="list-name">'${text}' 에 대한 검색 결과<span class="result-num">${uniqTitles.length}개</span></h2>
-        <div class="list-wrap">
-            <ul></ul>
-        </div>
-    </div>
-    `;
-    movieListWrap.innerHTML = "";
-    movieListWrap.innerHTML += resultArea;
-    //검색 결과 표시 공간 확보
-
-    sections.forEach((section) => {
-        fetch(`https://api.themoviedb.org/3/movie/${section}?language=ko&page=1`, options)
-        .then((response) => response.json())
-        .then((data) => {
-            data['results'].forEach(movie => {
-                let searchResultArea = movieListWrap.childNodes[1].childNodes[3].childNodes[1];
-                let title = movie['title']
-
-                if (uniqTitles.includes(title) && uniqTitles.length !== 0) {
-                    createCard(movie, searchResultArea);
-                    uniqTitles.splice(uniqTitles.indexOf(title), 1); // 등록이 끝난 요소는 배열에서 제거
-                } else if (uniqTitles.length === 0) {
-                    return //검색된 결과를 나타낼 것이 없으면 종료
-                }
-            });
-        });
-    });
-};

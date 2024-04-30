@@ -166,6 +166,18 @@ header ul li .button-wrap {
 .button-wrap .input-wrap input::placeholder {
     font-style: italic;
 }
+.input-wrap-toggle {
+    opacity: 1 !important;
+    left: 100px !important;
+}
+.cancel-icon-toggle {
+    opacity: 1 !important;
+    text-indent: 0 !important;
+}
+.magnify-icon-toggle {
+    opacity: 0 !important;
+    text-indent: -99999px !important;
+}
 
 /* 우측 컨텐츠 */
 
@@ -209,7 +221,7 @@ main .list-name {
     font-weight: 600;
     color: #b4a0a7;
 }
-.lis-name .result-num {
+.list-name .result-num {
     display: inline-block;
     font-size: 20px;
     font-weight: 600;
